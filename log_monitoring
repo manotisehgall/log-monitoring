@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Function to display log entries
+display_logs() {
+    log_file="/var/log/syslog"
+
+    # Check if the log file exists
+    if [ ! -f "$log_file" ]; then
+        echo "Error: Log file '$log_file' not found."
+        exit 1
+    fi
+
+    #to stop monitoring when pressing CTRL + C
+    trap 'echo "Monitoring stopped."; exit' INT
+
+    # Monitor the log file and display entries
+    tail -n 20 -F "$log_file"
+}
+
+# Function to analyze and generate summary report
+generate_summary() {
+    log_file="/var/log/syslog"
+
+    # Check if the log file exists
+    if [ ! -f "$log_file" ]; then
+        echo "Error: Log file '$log_file' not found."
+        exit 1
+    fi
+
+    # Analyze log entries
+    error_summary=$(tail -n 1000 "$log_file" | grep -i "error\|exception" | sort | uniq -c | sort -nr)
+    manoti_count=$(tail -n 1000 "$log_file" | grep -ci "manoti")
+    total_errors=$(grep -ciE "error|exception" "$log_file")
+    most_repeating_error=$(echo "$error_summary" | head -n 1)
+
+    # Display summary report
+    echo "Summary Report:"
+    echo "Occurrences of 'manoti': $manoti_count"
+    echo "Total number of errors: $total_errors"
+    echo "Most repeating error:"
+    echo "$most_repeating_error"
+}
+
+# Main function
+main() {
+    # Check if the -s option is passed
+    if [ "$1" = "-s" ]; then
+        generate_summary
+    else
+        display_logs
+    fi
+}
+
+# Run the main function with command-line arguments
+main "$@"
+
