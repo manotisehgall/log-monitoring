@@ -2,7 +2,7 @@
 
 This script offers two options for monitoring logs. When executed, it continuously displays newly generated logs until you press ctrl + c.
 
-Additionally, you can generate a summary of the monitored logs by using the command log_monitoring -s.
+Additionally, you can generate a summary of the logs by using the command log_monitoring -s.
 
 #Ensure the script is executable by running -
 chmod +x log_monitoring
